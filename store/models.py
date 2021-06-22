@@ -47,6 +47,20 @@ class Order(models.Model):
     def __str__(self):
         return str(self.id)
 
+    # Для модели заказа добавляю get_cart_total и get_cart_items пользуясь декоратором @property
+    @property
+
+    def get_cart_total(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.get_total for item in orderitems])
+        return total
+
+    @property
+    def get_cart_items(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitems])
+        return total
+
 
 # Для модели OrderItem потребуется атрибут продукта, связанный с моделью продукта, заказ,
 # к которому этот товар подключен, количество и дата добавления этого товара в корзину
@@ -56,6 +70,12 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
+
+    # Для модели OrderItem получаю общую цену из цены продукта, умноженной на количество
+    @property
+    def get_total(self):
+        total = self.product.price * self.quantity
+        return total
 
 
 # Добавляю модель адреса доставки, она будет дочерней для заказа и будет создана только в том случае,
