@@ -87,9 +87,21 @@
 
 	<script type="text/javascript">
 		var shipping = '{{order.shipping}}'
+		//установим итоговую сумму корзины
+		var total = '{{order.get_cart_total|floatformat:2}}'
 
 		if (shipping == 'False'){
 		 	document.getElementById('shipping-info').innerHTML = ''
+		}
+		if (user != 'AnonymousUser'){
+			document.getElementById('user-info').innerHTML = ''
+		 }
+
+		if (shipping == 'False' && user != 'AnonymousUser'){
+			//Скрыть всю форму, если пользователь вошел в систему, а доставка неверна
+			document.getElementById('form-wrapper').classList.add("hidden");
+			//Показывать оплату, если авторизованный пользователь хочет купить товар, для которого не требуется доставка
+			document.getElementById('payment-info').classList.remove("hidden");
 		}
 
 		var form = document.getElementById('form')
@@ -106,7 +118,41 @@
 
 		function submitFormData(){
 	    	console.log('Payment button clicked')
-	    }
+
+	    	//Отправляем «пользователь» и «доставка» как два отдельных объекта Javascript,
+	    	//чтобы мы могли получить к ним доступ отдельно в бэкэнде.
+	    	//Создадим объектное представление обоих. Для пользователя; давайте добавим «итого» и передадим переменную,
+	    	//которую мы установили чуть выше и далее устанавливаем значения из формы.
+
+	    	var userFormData = {
+				'name':null,
+				'email':null,
+				'total':total,
+		}
+
+			var shippingInfo = {
+				'address':null,
+				'city':null,
+				'state':null,
+				'zipcode':null,
+		}
+
+		if (shipping != 'False'){
+			shippingInfo.address = form.address.value
+			shippingInfo.city = form.city.value
+			shippingInfo.state = form.state.value
+			shippingInfo.zipcode = form.zipcode.value
+		}
+
+		if (user == 'AnonymousUser'){
+			userFormData.name = form.name.value
+			userFormData.email = form.email.value
+		}
+
+		console.log('Shipping Info:', shippingInfo)
+		console.log('User Info:', userFormData)
+		}
+	}
 	</script>
 
 {% endblock content %}
