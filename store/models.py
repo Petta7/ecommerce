@@ -47,9 +47,19 @@ class Order(models.Model):
     def __str__(self):
         return str(self.id)
 
+    # делаю цикл, который изменяет статус «доставка» на «истина», если дочерний элемент OrderItem не является цифровым.
+    # Затем метод просто возвращает истинное или ложное значение
+    @property
+    def shipping(self):
+        shipping = False
+        orderitems = self.orderitem_set.all()
+        for i in orderitems:
+            if i.product.digital == False:
+                shipping = True
+        return shipping
+
     # Для модели заказа добавляю get_cart_total и get_cart_items пользуясь декоратором @property
     @property
-
     def get_cart_total(self):
         orderitems = self.orderitem_set.all()
         total = sum([item.get_total for item in orderitems])

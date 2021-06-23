@@ -15,7 +15,7 @@ def store(request):
         cartItems = order.get_cart_items
     else:
         items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0}
+        order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
         cartItems = order['get_cart_items']
 
     products = Product.objects.all()
@@ -36,7 +36,7 @@ def cart(request):
         items = []
         # Cоздаю объект для пользователей, не вошедших в систему. Для этого объекта добавляю атрибуты get_cart_total
         # и get_cart_items и устанавливаю их равными 0, поскольку корзина гостей сейчас пуста.
-        order = {'get_cart_total': 0, 'get_cart_items': 0}
+        order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
         cartItems = order['get_cart_items']
 
     context = {'items': items, 'order': order, 'cartItems': cartItems}
@@ -54,7 +54,7 @@ def checkout(request):
         cartItems = order.get_cart_items
     else:
         items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0}
+        order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
         cartItems = order['get_cart_items']
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/checkout.html', context)

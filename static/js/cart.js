@@ -1,4 +1,4 @@
-//запросим все кнопки по классу корзины обновлений в cart.js и добавим обработчик событий в цикле.
+//запрашиваю все кнопки по классу корзины обновлений в cart.js и добавляю обработчик событий в цикле.
 var updateBtns = document.getElementsByClassName('update-cart')
 
 for (i = 0; i < updateBtns.length; i++) {

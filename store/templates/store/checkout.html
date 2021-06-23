@@ -74,4 +74,14 @@
 		</div>
 	</div>
 </div>
+
+<!--Нам нужно получить статус «доставка» из нашего объекта «заказ» и удалить поле адреса, если доставка ложная.
+	Напишем наш Javascript-->
+<script type="text/javascript">
+	var shipping = '{{order.shipping}}'
+
+	if (shipping == 'False'){
+	 	document.getElementById('shipping-info').innerHTML = ''
+	}
+</script>
 {% endblock content %}
