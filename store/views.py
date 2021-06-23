@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
+import datetime
 
 from .models import *
 
 
 # импортирую все модели и запрашиваю продукты в представлении магазина
 def store(request):
-
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
@@ -100,3 +100,41 @@ def updateItem(request):
         orderItem.delete()
 
     return JsonResponse('Item was added', safe=False)
+
+
+# Устанавливаю переменную идентификатора транзакции
+# Дальше нужно проанализировать данные, отправленные из почтового запроса, и запросить/создать некоторые данные,
+# если пользователь аутентифицирован. Опять же, мы будем игнорировать неаутентифицированных пользователей до следующего модуля.
+# Мы будем использовать json.loads () для анализа данных. Как только мы установим возвращаемое значение
+# для переменной «data», мы можем запрашивать элементы внутри как словарь Python.
+
+def processOrder(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        total = float(data['form']['total'])
+        order.transaction_id = transaction_id
+
+        # выполняю сравнение общего количества отправленных и нашей корзины
+        if total == order.get_cart_total:
+            order.complete = True
+        order.save()
+
+        # создаю экземпляр адреса доставки, если адрес был отправлен
+        if order.shipping == True:
+            ShippingAddress.objects.create(
+                customer=customer,
+                order=order,
+                address=data['shipping']['address'],
+                city=data['shipping']['city'],
+                state=data['shipping']['state'],
+                zipcode=data['shipping']['zipcode'],
+            )
+
+    else:
+        print('User is not logged in')
+
+    return JsonResponse('Payment submitted..', safe=False)
