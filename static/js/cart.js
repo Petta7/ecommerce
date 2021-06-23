@@ -15,9 +15,31 @@ for (i = 0; i < updateBtns.length; i++) {
             console.log('User is not authenticated')
 
         }else{
-            console.log('User is authenticated, sending data...')
+            updateUserOrder(productId, action)
 }
 
 	})
 }
 
+//создаю функцию с именем updateUserOrder () и даю ей два параметра: «productId» и «action».
+//Затем передам функцию в наш оператор «if», чтобы она вызывалась при входе пользователя в систему
+
+function updateUserOrder(productId, action){
+	console.log('User is authenticated, sending data...')
+
+		var url = '/update_item/'
+
+		fetch(url, {
+			method:'POST',
+			headers:{
+				'Content-Type':'application/json',
+			},
+			body:JSON.stringify({'productId':productId, 'action':action})
+		})
+		.then((response) => {
+		   return response.json();
+		})
+		.then((data) => {
+		    console.log('Data:', data)
+		});
+}
