@@ -49,8 +49,28 @@ def cart(request):
 
         # чтобы посмотреть общее количество товаров в корзине, мы можем просто просмотреть наш словарь корзины
         # и добавить общее количество каждого товара
+        #  далее добавим цикл в нашу «корзину» и запросим продукт, чтобы получить цену
         for i in cart:
             cartItems += cart[i]['quantity']
+
+            product = Product.objects.get(id=i)
+            total = (product.price * cart[i]['quantity'])
+
+            order['get_cart_total'] += total
+            order['get_cart_items'] += cart[i]['quantity']
+            # На каждой итерации цикла для товаров в нашей корзине мы будем создавать объект item и добавлять его
+            # в наш список товаров. Объект item будет содержать все те же атрибуты, что и наша модель OrderItem.
+            item = {
+                'product': {
+                    'id': product.id,
+                    'name': product.name,
+                    'price': product.price,
+                    'imageURL': product.imageURL
+                },
+                'quantity': cart[i]['quantity'],
+                'get_total': total,
+            }
+            items.append(item)
 
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/cart.html', context)
