@@ -30,6 +30,14 @@ def cart(request):
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
+        #  добавим логику в представление "cart" в нашем условном выражении, чтобы мы получали данные из файлов cookie
+        #  только тогда, когда посетитель НЕ вошел в систему. С помощью оператора try / except создаем пустую корзину
+        #  для работы, если она не существует
+        try:
+            cart = json.loads(request.COOKIES['cart'])
+        except:
+            cart = {}
+        print('Cart:', cart)
 
         # создаю пока пустую корзину для не вошедшего в систему пользователя
 
@@ -38,6 +46,11 @@ def cart(request):
         # и get_cart_items и устанавливаю их равными 0, поскольку корзина гостей сейчас пуста.
         order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
         cartItems = order['get_cart_items']
+
+        # чтобы посмотреть общее количество товаров в корзине, мы можем просто просмотреть наш словарь корзины
+        # и добавить общее количество каждого товара
+        for i in cart:
+            cartItems += cart[i]['quantity']
 
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/cart.html', context)
