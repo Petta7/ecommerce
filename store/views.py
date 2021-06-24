@@ -42,10 +42,10 @@ def cart(request):
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/cart.html', context)
 
-
 # Представляю порядок действий пользователя с помощью словаря, чтобы в нашем шаблоне всегда было
 # что запросить когда у нас есть покупатель и заказ / корзина, запрашиваю элементы корзины
 # с помощью order.orderitem_set.all ()
+
 def checkout(request):
     if request.user.is_authenticated:
         customer = request.user.customer

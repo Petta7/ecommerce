@@ -23,7 +23,7 @@
 		        var cookies = document.cookie.split(';');
 		        for (var i = 0; i < cookies.length; i++) {
 		            var cookie = cookies[i].trim();
-		            // Does this cookie string begin with the name we want?
+
 		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
 		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
 		                break;
@@ -32,8 +32,39 @@
 		    }
 		    return cookieValue;
 		}
-		var csrftoken = getToken('csrftoken')
+		var csrftoken = getToken('csrftoken');
+		console.log('CSRFTOKEN:', csrftoken)
 
+//После установка функции getCookie, установим для переменной "cart" значение, возвращаемое "cart" из нашего парсера файлов cookie
+		function getCookie(name) {
+			// Разделить строку cookie и получить все отдельные пары имя=значение в массиве
+			var cookieArr = document.cookie.split(";");
+
+			// Прокрутить элементы массива
+			for(var i = 0; i < cookieArr.length; i++) {
+				var cookiePair = cookieArr[i].split("=");
+
+				// Удалить пробелы в начале имени файла cookie и сравнить его с заданной строкой
+				if(name == cookiePair[0].trim()) {
+					// Расшифровать значение cookie и вернуть
+					return decodeURIComponent(cookiePair[1]);
+				}
+			}
+
+			// Вернуть null, если не найден
+			return null;
+		}
+
+//Если в нашем браузере нет файла cookie под названием «корзина», который ожидается при первой загрузке, давайте создадим его
+
+		var cart = JSON.parse(getCookie('cart'))
+
+		if (cart == undefined){
+			cart = {}
+			console.log('Cart Created!', cart)
+			document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+		}
+		console.log('Cart:', cart)
 	</script>
 
 </head>
