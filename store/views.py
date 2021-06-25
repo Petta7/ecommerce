@@ -4,19 +4,15 @@ import json
 import datetime
 
 from .models import *
-from .utils import cookieCart
+from .utils import cookieCart, cartData
 
 
 # импортирую все модели и запрашиваю продукты в представлении магазина
 def store(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        cookieData = cookieCart(request)
-        cartItems = cookieData['cartItems']
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+
 
     products = Product.objects.all()
     context = {'products': products, 'cartItems': cartItems}
@@ -24,18 +20,11 @@ def store(request):
 
 
 def cart(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        # Очистим всю логику и вызовем нашу функцию cookieCart. Устанавливаем возвращаемое значение в переменную cookieData.
-        # Затем мы можем получить доступ к этим значениям из cookieData и получить то, что нам нужно для каждого представления.
-        cookieData = cookieCart(request)
-        cartItems = cookieData['cartItems']
-        order = cookieData['order']
-        items = cookieData['items']
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
 
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/cart.html', context)
@@ -46,16 +35,12 @@ def cart(request):
 # с помощью order.orderitem_set.all ()
 
 def checkout(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        cookieData = cookieCart(request)
-        cartItems = cookieData['cartItems']
-        order = cookieData['order']
-        items = cookieData['items']
+
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
 
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/checkout.html', context)
