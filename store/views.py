@@ -9,10 +9,8 @@ from .utils import cookieCart, cartData
 
 # импортирую все модели и запрашиваю продукты в представлении магазина
 def store(request):
-
     data = cartData(request)
     cartItems = data['cartItems']
-
 
     products = Product.objects.all()
     context = {'products': products, 'cartItems': cartItems}
@@ -20,7 +18,6 @@ def store(request):
 
 
 def cart(request):
-
     data = cartData(request)
     cartItems = data['cartItems']
     order = data['order']
@@ -35,8 +32,6 @@ def cart(request):
 # с помощью order.orderitem_set.all ()
 
 def checkout(request):
-
-
     data = cartData(request)
     cartItems = data['cartItems']
     order = data['order']
@@ -101,15 +96,48 @@ def processOrder(request):
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
+
+    else:
+        print('User is not logged in')
+
+# Начнем с создания данных нашей корзины с помощью функции корзины файлов cookie.
+        print('COOKIES:', request.COOKIES)
+        name = data['form']['name']
+        email = data['form']['email']
+
+# Создаем заказ и устанавливаем значение только что установленной переменной клиента.
+# Для параметра «Complete» устанавливаем значение «false», поскольку это открытая корзина до подтверждения и обработки платежа.
+        cookieData = cookieCart(request)
+        items = cookieData['items']
+
+        customer, created = Customer.objects.get_or_create(
+            email=email,
+        )
+        customer.name = name
+        customer.save()
+
+# Пройдемся по списку реплик нашей корзины и создадим настоящие OrderItems, запросив продукт и установив необходимые атрибуты.
+        order = Order.objects.create(
+            customer=customer,
+            complete=False,
+        )
+
+        for item in items:
+            product = Product.objects.get(id=item['product']['id'])
+            orderItem = OrderItem.objects.create(
+                product=product,
+                order=order,
+                quantity=item['quantity'],
+            )
+#  Поскольку мы создали «заказ» как для авторизованных, так и для гостевых пользователей,
+#  нам необходимо сделать его доступным для обоих условий.
         total = float(data['form']['total'])
         order.transaction_id = transaction_id
 
-        # выполняю сравнение общего количества отправленных и нашей корзины
         if total == order.get_cart_total:
             order.complete = True
         order.save()
 
-        # создаю экземпляр адреса доставки, если адрес был отправлен
         if order.shipping == True:
             ShippingAddress.objects.create(
                 customer=customer,
@@ -120,7 +148,4 @@ def processOrder(request):
                 zipcode=data['shipping']['zipcode'],
             )
 
-    else:
-        print('User is not logged in')
-
-    return JsonResponse('Payment submitted..', safe=False)
+        return JsonResponse('Payment submitted..', safe=False)

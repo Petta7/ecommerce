@@ -176,6 +176,9 @@
 	    	.then((data) => {
 				  console.log('Success:', data);
 				  alert('Transaction completed');
+				  cart = {}
+// очистим корзину, когда наша кнопка / форма оплаты будет успешно отправлена
+				  document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
 				  window.location.href = "{% url 'store' %}"
 
 				})
