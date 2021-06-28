@@ -83,9 +83,12 @@
 <!-- Чтобы получить доступ к API оплаты PayPal, добавим следующий тег скрипта для API PayPal.
 Весь этот код берем из документации по ссылке: https://developer.paypal.com/demo/checkout -->
 
-<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=ATqbeHT5L_ptT7JFBD7XMyku0gY0eZPiv4JZgsmnEvJxtfmsd_BwXSYHgAkwIxdJTg7AHuoyN0gxad9S&currency=USD"></script>
 
 <script>
+	//установим итоговую сумму корзины
+	var total = '{{order.get_cart_total|floatformat:2}}'
+
     // Визуализируем кнопку PayPal в контейнер #paypal-button-container
     paypal.Buttons({
 
@@ -99,7 +102,7 @@
             return actions.order.create({
                 purchase_units: [{
                     amount: {
-                        value: '0.01'
+                        value: parseFloat(total).toFixed(2)
                     }
                 }]
             });
@@ -126,8 +129,7 @@
 
 <script type="text/javascript">
 		var shipping = '{{order.shipping}}'
-		//установим итоговую сумму корзины
-		var total = '{{order.get_cart_total|floatformat:2}}'
+
 
 		if (shipping == 'False'){
 		 	document.getElementById('shipping-info').innerHTML = ''
